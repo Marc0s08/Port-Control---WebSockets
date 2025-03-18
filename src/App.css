@@ -1,38 +1,43 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+body {
   display: flex;
-  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f2f5;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.game-area {
+  position: relative;
+  width: 600px;
+  height: 300px;
+  border: 3px solid #333;
+  background-color: #e8f5e9;
+  overflow: hidden;
+}
+
+.dino {
+  position: absolute;
+  bottom: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+  transition: left 0.1s ease;
+}
+
+.porta {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 40px;
+  height: 70px;
+  background-color: #795548;
+  border: 2px solid #4E342E;
+  border-radius: 5px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  font-size: 24px;
 }

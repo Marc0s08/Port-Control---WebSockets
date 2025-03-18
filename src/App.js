@@ -1,25 +1,41 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+
+const App = () => {
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {
+        const newSocket = new WebSocket('ws://192.168.0.113/ws');
+        newSocket.onopen = () => console.log('Conectado ao WebSocket');
+        newSocket.onerror = (error) => console.error('Erro na conexão:', error);
+        setSocket(newSocket);
+
+        return () => newSocket.close();
+    }, []);
+
+    const enviarComando = (comando) => {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(comando);
+        } else {
+            console.warn('WebSocket não está conectado.');
+        }
+    };
+
+    return (
+        <div style={{ textAlign: 'center', marginTop: '50px' }}>
+            <h1>Controle de porta</h1>
+            <button onClick={() => enviarComando('ligar')} style={botaoEstilo}>Abrir Porta</button>
+            <button onClick={() => enviarComando('desligar')} style={botaoEstilo}>Fechar Porta</button>
+        </div>
+    );
+};
+
+const botaoEstilo = {
+    margin: '10px',
+    padding: '10px 20px',
+    fontSize: '18px',
+    cursor: 'pointer'
+};
 
 export default App;
