@@ -1,15 +1,15 @@
 .container {
   text-align: center;
   margin-top: 50px;
-  background-color: #f0f2f5;
-  padding: 40px;
+  background-color: #000000;
+  padding: 200px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
   color: #4CAF50;
-  margin-bottom: 20px;
+  margin-bottom: 60px;
 }
 
 .mensagem {
@@ -18,18 +18,39 @@ h1 {
   margin-bottom: 20px;
 }
 
-.botao {
+.botaovermelho {
   margin: 10px;
   padding: 12px 24px;
   font-size: 18px;
-  color: #fff;
-  background-color: #4CAF50;
+  color: #000000;
+  background-color: #f11414;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
+.botaoamarelo {
+  margin: 10px;
+  padding: 12px 24px;
+  font-size: 18px;
+  color: #000000;
+  background-color: #f5ed03;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.botaoverde {
+  margin: 10px;
+  padding: 12px 24px;
+  font-size: 18px;
+  color: #000000;
+  background-color: #16d800;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 .botao:hover {
   background-color: #45a049;
 }
