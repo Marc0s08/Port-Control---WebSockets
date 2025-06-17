@@ -1,47 +1,82 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 
 const App = () => {
     const [socket, setSocket] = useState(null);
+    const squareRef = useRef(null);
+    const [pos, setPos] = useState({ x: 50, y: 50 }); // posição em %
+    const [status, setStatus] = useState('Conectando...');
+    const lastSent = useRef({ x: null, y: null });
+    const timeoutRef = useRef(null);
 
     useEffect(() => {
-        const newSocket = new WebSocket('ws://192.168.0.112/ws');
-        newSocket.onopen = () => console.log('Conectado ao WebSocket');
-        newSocket.onerror = (error) => console.error('Erro na conexão:', error);
-        setSocket(newSocket);
+        const newSocket = new WebSocket('ws://192.168.0.157/ws');
 
+        newSocket.onopen = () => setStatus('Conectado ✅');
+        newSocket.onerror = () => setStatus('Erro na conexão ❌');
+        newSocket.onclose = () => setStatus('Desconectado 🔌');
+
+        setSocket(newSocket);
         return () => newSocket.close();
     }, []);
 
-    const enviarComando = (comando) => {
+    const enviarComando = (x, y) => {
+        // Evita enviar comandos repetidos
+        if (x === lastSent.current.x && y === lastSent.current.y) return;
+
         if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(comando);
+            socket.send(JSON.stringify({ x, y }));
+            lastSent.current = { x, y };
         }
     };
 
-    const iniciarEnvioContínuo = (comando) => {
-        enviarComando(comando); // envia logo no início
-        const interval = setInterval(() => enviarComando(comando), 100);
+    const atualizarPosicao = (clientX, clientY) => {
+        const square = squareRef.current;
+        if (!square) return;
 
-        const parar = () => {
-            clearInterval(interval);
-            document.removeEventListener('mouseup', parar);
-            document.removeEventListener('touchend', parar);
-        };
+        const rect = square.getBoundingClientRect();
+        const offsetX = clientX - rect.left;
+        const offsetY = clientY - rect.top;
 
-        document.addEventListener('mouseup', parar);
-        document.addEventListener('touchend', parar);
+        let x = Math.max(0, Math.min(1, offsetX / rect.width));
+        let y = Math.max(0, Math.min(1, offsetY / rect.height));
+
+        const porcentagemX = Math.round(x * 100);
+        const porcentagemY = Math.round(y * 100);
+
+        setPos({ x: porcentagemX, y: porcentagemY });
+
+        // Pequeno debounce (evita sobrecarregar o WebSocket)
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            enviarComando(porcentagemX, porcentagemY);
+        }, 30);
     };
 
     return (
         <div className="container">
-            <h1>Controle de posição servo motor</h1>
-            <button onMouseDown={() => iniciarEnvioContínuo('me')} className="botaovermelho">Mover servo Base esquerda</button>
-            <button onMouseDown={() => iniciarEnvioContínuo('md')} className="botaovermelho">Mover servo Base direita</button>
-            <button onMouseDown={() => iniciarEnvioContínuo('if')} className="botaoamarelo">Inclinar para frente</button>
-            <button onMouseDown={() => iniciarEnvioContínuo('it')} className="botaoamarelo">Inclinar para trás</button>
-            <button onMouseDown={() => iniciarEnvioContínuo('ag')} className="botaoverde">Abrir garra</button>
-            <button onMouseDown={() => iniciarEnvioContínuo('fg')} className="botaoverde">Fechar garra</button>
+            <h1>Controle WebSocket</h1>
+            <p>Status: <strong>{status}</strong></p>
+
+            <div
+                ref={squareRef}
+                className="quadrado"
+                onMouseMove={(e) => {
+                    if (e.buttons === 1) atualizarPosicao(e.clientX, e.clientY);
+                }}
+                onTouchMove={(e) => {
+                    const touch = e.touches[0];
+                    atualizarPosicao(touch.clientX, touch.clientY);
+                }}
+            >
+                <div
+                    className="ponto"
+                    style={{
+                        left: `${pos.x}%`,
+                        top: `${pos.y}%`
+                    }}
+                />
+            </div>
         </div>
     );
 };
